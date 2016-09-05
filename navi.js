@@ -6,6 +6,46 @@ var request = require('request');
 var nodeArgs = process.argv;
 
 /**
+ * Spotify Functionality
+ **/
+if (process.argv[2] === "spotify-this-song") {
+    if (process.argv[3]) {
+    var trackName = "";
+    for (var i = 3; i < nodeArgs.length; i++) {
+        if (i > 3 && i < nodeArgs.length) {
+            trackName = trackName + "+" + nodeArgs[i];
+        } else {
+            trackName = trackName + nodeArgs[i];
+        }
+    }
+} else {
+    var trackName = 'ace+of+base+the+sign';
+}
+    spotify.search({
+        type: 'track',
+        query: trackName + '&limit=1&'
+    }, function(error, data) {
+        if (error) {
+            console.log('Error occurred: ' + error);
+            return;
+        }
+        if (!error && data) {
+            console.log('');
+            console.log('================================');
+            console.log("Track Title: " + data.tracks.items[0].name);
+            console.log('================================');
+            console.log('');
+            console.log("Artist Name: " + data.tracks.items[0].artists[0].name);
+    		console.log("Album: " + data.tracks.items[0].album.name);
+    		console.log("Preview URL: " + data.tracks.items[0].preview_url);
+            console.log('');
+            console.log('================================');
+            console.log('');
+        }
+    });
+}
+
+/**
  * OMDB Functionality
  **/
 if (process.argv[2] === "movie-this") {
