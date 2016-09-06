@@ -12,7 +12,7 @@ var arg = "";
 var action = process.argv[2];
 
 /**
- * Capitalize first letter of query strings to fix undefinted queries
+ * Capitalize first letter of query strings to fix undefined queries
  **/
 String.prototype.capitalizeFirstLetter = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
