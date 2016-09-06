@@ -15,11 +15,27 @@ var client = new twitter({
     access_token_secret: keys.twitterKeys.access_token_secret
 });
 
-if (process.argv[2] === "my-tweets") {
+if (process.argv[2] === "last-tweets") {
+    if (process.argv[3]) {
+        var userName = "";
+        for (var i = 3; i < nodeArgs.length; i++) {
+            if (i > 3 && i < nodeArgs.length) {
+                userName = userName + nodeArgs[i];
+            } else {
+                userName = userName + nodeArgs[i];
+            }
+        }
+    } else {
+        var userName = 'neurohacked';
+    }
     var params = {
-        screen_name: 'neurohacked'
+        screen_name: userName
     };
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
+        if (error) {
+            console.log('Error occurred: ' + error);
+            return;
+        }
         if (!error) {
             var tweetNum = 1;
             for (var i = 0; i < tweets.length; i++) {
