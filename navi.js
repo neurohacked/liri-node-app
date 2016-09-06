@@ -6,21 +6,52 @@ var request = require('request');
 var nodeArgs = process.argv;
 
 /**
+ * Twitter Functionality
+ **/
+var client = new twitter({
+    consumer_key: keys.twitterKeys.consumer_key,
+    consumer_secret: keys.twitterKeys.consumer_secret,
+    access_token_key: keys.twitterKeys.access_token_key,
+    access_token_secret: keys.twitterKeys.access_token_secret
+});
+
+if (process.argv[2] === "my-tweets") {
+    var params = {
+        screen_name: 'neurohacked'
+    };
+    client.get('statuses/user_timeline', params, function(error, tweets, response) {
+        if (!error) {
+            var tweetNum = 1;
+            for (var i = 0; i < tweets.length; i++) {
+                console.log('');
+                console.log('================================');
+                console.log('');
+                console.log("Twitter Status #" + tweetNum + " : \n\n" + tweets[i].text);
+                tweetNum++;
+            }
+            console.log('');
+            console.log('================================');
+            console.log('');
+        }
+    });
+}
+
+/**
  * Spotify Functionality
  **/
 if (process.argv[2] === "spotify-this-song") {
     if (process.argv[3]) {
-    var trackName = "";
-    for (var i = 3; i < nodeArgs.length; i++) {
-        if (i > 3 && i < nodeArgs.length) {
-            trackName = trackName + "+" + nodeArgs[i];
-        } else {
-            trackName = trackName + nodeArgs[i];
+        var trackName = "";
+        for (var i = 3; i < nodeArgs.length; i++) {
+            if (i > 3 && i < nodeArgs.length) {
+                trackName = trackName + "+" + nodeArgs[i];
+            } else {
+                trackName = trackName + nodeArgs[i];
+            }
         }
+    } else {
+        var trackName = 'ace+of+base+the+sign';
     }
-} else {
-    var trackName = 'ace+of+base+the+sign';
-}
     spotify.search({
         type: 'track',
         query: trackName + '&limit=1&'
@@ -36,8 +67,8 @@ if (process.argv[2] === "spotify-this-song") {
             console.log('================================');
             console.log('');
             console.log("Artist Name: " + data.tracks.items[0].artists[0].name);
-    		console.log("Album: " + data.tracks.items[0].album.name);
-    		console.log("Preview URL: " + data.tracks.items[0].preview_url);
+            console.log("Album: " + data.tracks.items[0].album.name);
+            console.log("Preview URL: " + data.tracks.items[0].preview_url);
             console.log('');
             console.log('================================');
             console.log('');
@@ -92,24 +123,6 @@ if (process.argv[2] === "movie-this") {
     });
 
 }
-
-/**
- * Stream statuses filtered by keyword
- * number of tweets per second depends on topic popularity
- **/
-// client.stream('statuses/filter', {track: 'twitter'},  function(stream) {
-//   stream.on('data', function(tweet) {
-//     console.log(tweet.text);
-//   });
-//
-//   stream.on('error', function(error) {
-//     console.log(error);
-//   });
-// });
-//
-// console.log(keys.twitterKeys);
-
-
 
 // Make it so liri.js can take in one of the following commands:
 //
