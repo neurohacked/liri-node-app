@@ -1,5 +1,6 @@
-var keys = require('./keys.js');
+var fs = require('fs');
 var twitter = require('twitter');
+var keys = require('./keys.js');
 var spotify = require('spotify');
 var request = require('request');
 
@@ -140,6 +141,31 @@ if (process.argv[2] === "movie-this") {
 
 }
 
+/**
+ * Do What It Says Functionality
+ **/
+function doWhatItSays() {
+
+    // We will read the existing bank file
+    fs.readFile('random.txt', "utf8", function(error, data) {
+
+        // Break down all the numbers inside
+        data = data.split(', ');
+        //  var result = 0;
+
+        // Loop through those numbers and add them together to get a sum.
+         for (var i = 0; i < data.length; i++) {
+             result = data[i];
+         }
+
+        // We will then print the final balance rounded to two decimal places.
+        console.log(result);
+    });
+}
+
+if (process.argv[2] === "do-what-it-says") {
+    doWhatItSays();
+}
 // Make it so liri.js can take in one of the following commands:
 //
 //    * `my-tweets`
