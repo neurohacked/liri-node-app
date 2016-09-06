@@ -1,3 +1,6 @@
+/**
+ * Variables
+ **/
 var fs = require('fs');
 var twitter = require('twitter');
 var keys = require('./keys.js');
@@ -5,32 +8,65 @@ var spotify = require('spotify');
 var request = require('request');
 
 var nodeArgs = process.argv;
+var arg = "";
+var action = process.argv[2];
+
+/**
+ * Capitalize first letter of query strings to fix undefinted queries
+ **/
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+/**
+ * Gather argument
+ **/
+for (var i = 3; i < nodeArgs.length; i++) {
+    if (i > 3 && i < nodeArgs.length) {
+        arg = arg + "+" + nodeArgs[i].capitalizeFirstLetter();
+    } else {
+        arg = arg + nodeArgs[i].capitalizeFirstLetter();
+    }
+}
+
+/**
+ * Switch actions
+ **/
+switch (action) {
+    case 'latest-tweets':
+        twitterStream(arg);
+        break;
+
+    case 'spotify-this':
+        spotifyTrack(arg);
+        break;
+
+    case 'movie-this':
+        movieInfo(arg);
+        break;
+
+    case 'do-what-it-says':
+        doIt();
+        break;
+}
 
 /**
  * Twitter Functionality
  **/
-var client = new twitter({
-    consumer_key: keys.twitterKeys.consumer_key,
-    consumer_secret: keys.twitterKeys.consumer_secret,
-    access_token_key: keys.twitterKeys.access_token_key,
-    access_token_secret: keys.twitterKeys.access_token_secret
-});
-
-if (process.argv[2] === "last-tweets") {
-    if (process.argv[3]) {
-        var userName = "";
-        for (var i = 3; i < nodeArgs.length; i++) {
-            if (i > 3 && i < nodeArgs.length) {
-                userName = userName + nodeArgs[i];
-            } else {
-                userName = userName + nodeArgs[i];
-            }
-        }
-    } else {
-        var userName = 'neurohacked';
+function twitterStream(arg) {
+    if (!arg) {
+        arg = "neurohacked";
     }
+
+    var client = new twitter({
+        consumer_key: keys.twitterKeys.consumer_key,
+        consumer_secret: keys.twitterKeys.consumer_secret,
+        access_token_key: keys.twitterKeys.access_token_key,
+        access_token_secret: keys.twitterKeys.access_token_secret
+    });
+
     var params = {
-        screen_name: userName
+        screen_name: arg
     };
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
         if (error) {
@@ -41,13 +77,13 @@ if (process.argv[2] === "last-tweets") {
             var tweetNum = 1;
             for (var i = 0; i < tweets.length; i++) {
                 console.log('');
-                console.log('================================');
+                console.log('==========================================');
                 console.log('');
                 console.log("Twitter Status #" + tweetNum + " : \n\n" + tweets[i].text);
                 tweetNum++;
             }
             console.log('');
-            console.log('================================');
+            console.log('==========================================');
             console.log('');
         }
     });
@@ -56,22 +92,14 @@ if (process.argv[2] === "last-tweets") {
 /**
  * Spotify Functionality
  **/
-if (process.argv[2] === "spotify-this-song") {
-    if (process.argv[3]) {
-        var trackName = "";
-        for (var i = 3; i < nodeArgs.length; i++) {
-            if (i > 3 && i < nodeArgs.length) {
-                trackName = trackName + "+" + nodeArgs[i];
-            } else {
-                trackName = trackName + nodeArgs[i];
-            }
-        }
-    } else {
-        var trackName = 'ace+of+base+the+sign';
+function spotifyTrack(arg) {
+    if (!arg) {
+        arg = "Ace of Base The Sign";
     }
+
     spotify.search({
         type: 'track',
-        query: trackName + '&limit=1&'
+        query: arg + '&limit=1&'
     }, function(error, data) {
         if (error) {
             console.log('Error occurred: ' + error);
@@ -79,15 +107,15 @@ if (process.argv[2] === "spotify-this-song") {
         }
         if (!error && data) {
             console.log('');
-            console.log('================================');
+            console.log('==========================================');
             console.log("Track Title: " + data.tracks.items[0].name);
-            console.log('================================');
+            console.log('==========================================');
             console.log('');
             console.log("Artist Name: " + data.tracks.items[0].artists[0].name);
             console.log("Album: " + data.tracks.items[0].album.name);
             console.log("Preview URL: " + data.tracks.items[0].preview_url);
             console.log('');
-            console.log('================================');
+            console.log('==========================================');
             console.log('');
         }
     });
@@ -96,21 +124,12 @@ if (process.argv[2] === "spotify-this-song") {
 /**
  * OMDB Functionality
  **/
-if (process.argv[2] === "movie-this") {
-    if (process.argv[3]) {
-        var movieName = "";
-        for (var i = 3; i < nodeArgs.length; i++) {
-            if (i > 3 && i < nodeArgs.length) {
-                movieName = movieName + "+" + nodeArgs[i];
-            } else {
-                movieName = movieName + nodeArgs[i];
-            }
-        }
-    } else {
-        var movieName = "Mr.+Nobody";
+function movieInfo(arg) {
+    if (!arg) {
+        arg = "Mr.+Nobody";
     }
 
-    var queryUrl = 'http://www.omdbapi.com/?t=' + movieName + '&y=&plot=short&tomatoes=true&r=json';
+    var queryUrl = 'http://www.omdbapi.com/?t=' + arg + '&y=&plot=short&tomatoes=true&r=json';
 
     request(queryUrl, function(error, response, body) {
         if (error) {
@@ -119,9 +138,9 @@ if (process.argv[2] === "movie-this") {
         }
         if (!error && response.statusCode == 200) {
             console.log('');
-            console.log('================================');
+            console.log('==========================================');
             console.log("Movie: " + JSON.parse(body).Title);
-            console.log('================================');
+            console.log('==========================================');
             console.log('');
             console.log("Plot: " + JSON.parse(body).Plot);
             console.log('');
@@ -134,44 +153,25 @@ if (process.argv[2] === "movie-this") {
             console.log("Rotten Tomatoes Rating: " + JSON.parse(body).tomatoRating);
             console.log("Rotten Tomatoes URL: " + JSON.parse(body).tomatoURL);
             console.log('');
-            console.log('================================');
+            console.log('==========================================');
             console.log('');
         }
     });
-
 }
 
 /**
  * Do What It Says Functionality
  **/
-function doWhatItSays() {
-
-    // We will read the existing bank file
+function doIt() {
     fs.readFile('random.txt', "utf8", function(error, data) {
-
-        // Break down all the numbers inside
-        data = data.split(', ');
-        //  var result = 0;
-
-        // Loop through those numbers and add them together to get a sum.
-         for (var i = 0; i < data.length; i++) {
-             result = data[i];
-         }
-
-        // We will then print the final balance rounded to two decimal places.
-        console.log(result);
+        data = data.split(",");
+        arg = data[1].replace(/"/g,'');
+        if (data[0] === 'latest-tweets') {
+            twitterStream(arg);
+        } else if (data[0] === 'spotify-this') {
+            spotifyTrack(arg);
+        } else if (data[0] === 'movie-this') {
+            movieInfo(arg);
+        }
     });
 }
-
-if (process.argv[2] === "do-what-it-says") {
-    doWhatItSays();
-}
-// Make it so liri.js can take in one of the following commands:
-//
-//    * `my-tweets`
-//
-//    * `spotify-this-song`
-//
-//    * `movie-this`
-//
-//    * `do-what-it-says`
