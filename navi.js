@@ -74,17 +74,17 @@ function twitterStream(param) {
             return;
         }
         if (!error) {
-            var tweetNum = 1;
+            console.log('');
+            console.log('==========================================');
+            console.log("Twitter User: " + tweets[0].user.screen_name);
+            console.log('==========================================');
+            console.log('');
             for (var i = 0; i < tweets.length; i++) {
+                console.log(tweets[i].created_at + " : \n\n" + tweets[i].text);
                 console.log('');
                 console.log('==========================================');
                 console.log('');
-                console.log("Twitter Status #" + tweetNum + " : \n\n" + tweets[i].text);
-                tweetNum++;
             }
-            console.log('');
-            console.log('==========================================');
-            console.log('');
         }
     });
 }
