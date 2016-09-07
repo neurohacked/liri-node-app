@@ -8,7 +8,7 @@ var spotify = require('spotify');
 var request = require('request');
 
 var nodeArgs = process.argv;
-var arg = "";
+var param = "";
 var action = process.argv[2];
 
 /**
@@ -23,9 +23,9 @@ String.prototype.capitalizeFirstLetter = function() {
  **/
 for (var i = 3; i < nodeArgs.length; i++) {
     if (i > 3 && i < nodeArgs.length) {
-        arg = arg + "+" + nodeArgs[i].capitalizeFirstLetter();
+        param = param + "+" + nodeArgs[i].capitalizeFirstLetter();
     } else {
-        arg = arg + nodeArgs[i].capitalizeFirstLetter();
+        param = param + nodeArgs[i].capitalizeFirstLetter();
     }
 }
 
@@ -34,15 +34,15 @@ for (var i = 3; i < nodeArgs.length; i++) {
  **/
 switch (action) {
     case 'latest-tweets':
-        twitterStream(arg);
+        twitterStream(param);
         break;
 
     case 'spotify-this':
-        spotifyTrack(arg);
+        spotifyTrack(param);
         break;
 
     case 'movie-this':
-        movieInfo(arg);
+        movieInfo(param);
         break;
 
     case 'do-what-it-says':
@@ -53,9 +53,9 @@ switch (action) {
 /**
  * Twitter Functionality
  **/
-function twitterStream(arg) {
-    if (!arg) {
-        arg = "neurohacked";
+function twitterStream(param) {
+    if (!param) {
+        param = "neurohacked";
     }
 
     var client = new twitter({
@@ -66,7 +66,7 @@ function twitterStream(arg) {
     });
 
     var params = {
-        screen_name: arg
+        screen_name: param
     };
     client.get('statuses/user_timeline', params, function(error, tweets, response) {
         if (error) {
@@ -92,14 +92,14 @@ function twitterStream(arg) {
 /**
  * Spotify Functionality
  **/
-function spotifyTrack(arg) {
-    if (!arg) {
-        arg = "Ace of Base The Sign";
+function spotifyTrack(param) {
+    if (!param) {
+        param = "Ace of Base The Sign";
     }
 
     spotify.search({
         type: 'track',
-        query: arg + '&limit=1&'
+        query: param + '&limit=1&'
     }, function(error, data) {
         if (error) {
             console.log('Error occurred: ' + error);
@@ -124,12 +124,12 @@ function spotifyTrack(arg) {
 /**
  * OMDB Functionality
  **/
-function movieInfo(arg) {
-    if (!arg) {
-        arg = "Mr.+Nobody";
+function movieInfo(param) {
+    if (!param) {
+        param = "Mr.+Nobody";
     }
 
-    var queryUrl = 'http://www.omdbapi.com/?t=' + arg + '&y=&plot=short&tomatoes=true&r=json';
+    var queryUrl = 'http://www.omdbapi.com/?t=' + param + '&y=&plot=short&tomatoes=true&r=json';
 
     request(queryUrl, function(error, response, body) {
         if (error) {
@@ -165,13 +165,13 @@ function movieInfo(arg) {
 function doIt() {
     fs.readFile('random.txt', "utf8", function(error, data) {
         data = data.split(",");
-        arg = data[1].replace(/"/g,'');
+        param = data[1].replace(/"/g,'');
         if (data[0] === 'latest-tweets') {
-            twitterStream(arg);
+            twitterStream(param);
         } else if (data[0] === 'spotify-this') {
-            spotifyTrack(arg);
+            spotifyTrack(param);
         } else if (data[0] === 'movie-this') {
-            movieInfo(arg);
+            movieInfo(param);
         }
     });
 }
