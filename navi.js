@@ -1,7 +1,14 @@
 /**
  * Variables
  **/
+var currentDate = '[' + new Date().toUTCString() + '] ';
 var fs = require('fs');
+var util = require('util');
+var logFile = fs.createWriteStream('log.txt', {
+    flags: 'a'
+});
+var logStdout = process.stdout;
+
 var twitter = require('twitter');
 var keys = require('./keys.js');
 var spotify = require('spotify');
@@ -10,6 +17,17 @@ var request = require('request');
 var nodeArgs = process.argv;
 var param = "";
 var action = process.argv[2];
+var output = "";
+
+/**
+ * Log Output
+ **/
+fs.appendFile('log.txt', currentDate + action + param + '\n');
+console.log = function() {
+    logFile.write(util.format.apply(null, arguments) + '\n');
+    logStdout.write(util.format.apply(null, arguments) + '\n');
+};
+console.error = console.log;
 
 /**
  * Capitalize first letter of query strings to fix undefined queries
@@ -165,7 +183,7 @@ function movieInfo(param) {
 function doIt() {
     fs.readFile('random.txt', "utf8", function(error, data) {
         data = data.split(",");
-        param = data[1].replace(/"/g,'');
+        param = data[1].replace(/"/g, '');
         if (data[0] === 'latest-tweets') {
             twitterStream(param);
         } else if (data[0] === 'spotify-this') {
