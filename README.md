@@ -86,3 +86,7 @@ To use the `node latest-tweets` command, you will need a keys.js file and your T
 
 ### OMDB
 <img src="img/omdb-output.png" width="65%" alt="OMDB Output"/>
+
+## Future Development
+* Implement a front-end
+* Enable Twitter functionality without the need of an API key. (Twitter sign-in/authorization)
